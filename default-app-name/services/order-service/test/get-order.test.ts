@@ -1,7 +1,7 @@
 import axios from "axios";
 import sinon from "sinon";
 import nock from "nock";
-import { startWebServer, stopWebServer } from "../entry-points_express/api_express/server_express";
+import { startWebServer, stopWebServer } from "../entry-points/api/server";
 
 // Configuring file-level HTTP client with base URL will allow
 // all the tests to approach with a shortened syntax
@@ -40,28 +40,46 @@ afterAll(async () => {
   stopWebServer();
 });
 
+// ️️️✅ Best Practice: Structure tests by routes and stories
 describe("/api", () => {
-  describe("DELETE /order", () => {
-    test("When deleting an existing order, Then it should NOT be retrievable", async () => {
-      // Arrange
-      const orderToDelete = {
+  describe("GET /order", () => {
+    test("When asked for an existing order, Then should retrieve it and receive 200 response", async () => {
+      //Arrange
+      const orderToAdd = {
         userId: 1,
         productId: 2,
         deliveryAddress: "123 Main St, New York, NY 10001",
         paymentTermsInDays: 30,
       };
-      const deletedOrderId = (
-        await axiosAPIClient.post("/order", orderToDelete)
-      ).data.id;
+      const {
+        data: { id: addedOrderId },
+      } = await axiosAPIClient.post(`/order`, orderToAdd);
 
-      // Act
-      await axiosAPIClient.delete(`/order/${deletedOrderId}`);
+      //Act
+      // ️️️✅ Best Practice: Use generic and reputable HTTP client like Axios or Fetch. Avoid libraries that are coupled to
+      // the web framework or include custom assertion syntax (e.g. Supertest)
+      const getResponse = await axiosAPIClient.get(`/order/${addedOrderId}`);
 
-      // Assert
-      const aQueryForDeletedOrder = await axiosAPIClient.get(
-        `/order/${deletedOrderId}`
+      //Assert
+      expect(getResponse).toMatchObject({
+        status: 200,
+        data: {
+          ...orderToAdd,
+        },
+      });
+    });
+
+    test("When asked for an non-existing order, Then should receive 404 response", async () => {
+      //Arrange
+      const nonExistingOrderId = -1;
+
+      //Act
+      const getResponse = await axiosAPIClient.get(
+        `/order/${nonExistingOrderId}`
       );
-      expect(aQueryForDeletedOrder.status).toBe(404);
+
+      //Assert
+      expect(getResponse.status).toBe(404);
     });
   });
 });
