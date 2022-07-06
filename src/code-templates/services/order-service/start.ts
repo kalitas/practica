@@ -1,5 +1,5 @@
 import * as logger from "@practica/logger";
-import { startWebServer } from "./entry-points/api/server";
+import { startWebServer } from "./entry-points_fastify/api/server";
 import { AppError, errorHandler } from "@practica/error-handling";
 
 // ⚠️❗️ The example app is very simplistic now and lacks many good practices. Consider visiting

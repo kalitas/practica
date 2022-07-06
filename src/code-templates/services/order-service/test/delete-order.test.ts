@@ -1,7 +1,7 @@
 import axios from "axios";
 import sinon from "sinon";
 import nock from "nock";
-import { startWebServer, stopWebServer } from "../entry-points/api/server";
+import { startWebServer, stopWebServer } from "../entry-points_express/api/server";
 
 // Configuring file-level HTTP client with base URL will allow
 // all the tests to approach with a shortened syntax

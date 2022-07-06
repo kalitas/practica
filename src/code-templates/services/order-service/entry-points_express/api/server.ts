@@ -36,11 +36,12 @@ async function openConnection(
   return new Promise((resolve, reject) => {
     // ️️️✅ Best Practice: Allow a dynamic port (port 0 = ephemeral) so multiple webservers can be used in multi-process testing
     const portToListenTo = configurationProvider.getValue("port");
-    const webServerPort = portToListenTo || 0;
+    const webServerPort = portToListenTo || 8091;
     logger.info(`About to listen to port ${webServerPort}`);
     connection = expressApp.listen(webServerPort, () => {
       errorHandler.listenToErrorEvents(connection);
       resolve(connection.address() as AddressInfo);
+      console.log(`Server listening at ${webServerPort}`)
     });
   });
 }
